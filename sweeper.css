@@ -1,0 +1,23 @@
+td {
+    height: 15px;
+    width: 20px;
+    background-color: #C0C0C0;
+    border: 2.5px solid;
+    border-top-color: #ffffff;
+    border-right-color: #7B7B7B;
+    border-bottom-color: #7B7B7B;
+    border-left-color: #ffffff;
+    text-align: center;
+    vertical-align: middle;
+}
+
+table {
+    background-color: lightgray;
+    margin: auto;
+}
+
+.clickedCell {
+    background-color: darkgray;
+    border: 1px solid;
+    border-color: darkgray;
+}
