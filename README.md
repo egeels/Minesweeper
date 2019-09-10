@@ -1,2 +1,2 @@
-# scaling-computing-machine
+# Minesweeper
 This my JS minesweeper thingy
