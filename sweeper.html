@@ -7,8 +7,12 @@
 <body>
     
     <table>
-        <input id = "newRows" placeholder = "Rows" type = "number" onkeydown = "handlers.rowChange()" ><br>
-        <input id = "newCols" placeholder = "Cols" type = "number" onkeydown = "handlers.colChange()"><br>
+        <div style = "text-align: center">
+            <input id = "newRows" placeholder = "Rows" type = "number" onkeydown = "handlers.rowChange()"><br>
+            <input id = "newCols" placeholder = "Cols" type = "number" onkeydown = "handlers.colChange()"><br>
+            <button onclick="handlers.restart()" id = "restartButton"><img src = "face.jpg" width = 100% height = auto></button>
+            </div>
+        </div>
         <tbody>
         </tbody>
     </table>

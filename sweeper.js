@@ -4,6 +4,7 @@ const REVEALED = 3;
 var COLUMNS = 20;
 var ROWS = 20;
 var TOTALMINES = 0;
+var FIRSTCLICK = true;
 
 function checkCoord (x,y){
     if (x >= 0 && x < ROWS && y >= 0 && y < COLUMNS)
@@ -45,13 +46,14 @@ var board = {
             this.cells.push(temp);
         }
     },
-    makeMines: function () {
+    makeMines: function (clickedCellRow, clickedCellCol) {
         var totalMines = 0;
         for (var i = 0; i < ROWS; i++)
         {
             for (var j = 0; j < COLUMNS; j++)
             {
-                if (Math.random() <= .15)
+                if (Math.random() <= .15 &&( i < clickedCellRow - 1 || i > clickedCellRow + 1
+                                         || j < clickedCellCol - 1 || j > clickedCellCol + 1))
                 {
                     this.cells[i][j].mine = true;
                     this.cells[i][j].number = 10;
@@ -130,9 +132,7 @@ var handlers = {
         {
             newRows = document.getElementById("newRows");
             ROWS = newRows.valueAsNumber;
-            board.createBoard(ROWS,COLUMNS);
-            TOTALMINES = board.makeMines();
-            view.displayBoard();
+            this.restart();
             newRows.value = '';
         }
     },
@@ -141,11 +141,17 @@ var handlers = {
         {
             newCols = document.getElementById("newCols");
             COLUMNS = newCols.valueAsNumber;
-            board.createBoard(ROWS,COLUMNS);
-            TOTALMINES = board.makeMines();
-            view.displayBoard();
+            this.restart();
             newCols.value = '';
         }
+    }, 
+    restart: function () {
+        FIRSTCLICK = true;
+        TOTALMINES = 0;
+        board.createBoard(ROWS,COLUMNS);
+        view.displayBoard();
+        var face = document.querySelector("img");
+        face.setAttribute("src", "face.jpg");
     }
 };
 
@@ -193,6 +199,24 @@ var view = {
                             if (board.cells[i][j].number !== 0)               
                                 tableTd.innerHTML = board.cells[i][j].number;
                             tableTd.setAttribute("class","clickedCell");
+                            switch(board.cells[i][j].number)
+                            {
+                                case 1:
+                                    tableTd.setAttribute("style","color: blue");
+                                    break;
+                                case 2:
+                                    tableTd.setAttribute("style","color: green");
+                                    break;
+                                case 3:
+                                    tableTd.setAttribute("style","color: red");
+                                    break;
+                                case 4:
+                                    tableTd.setAttribute("style","color: purple");
+                                    break;
+                                case 5:
+                                    tableTd.setAttribute("style","color: darkred");
+                                    break;
+                            }
                         }
                         break;
                 }
@@ -202,15 +226,36 @@ var view = {
     },
     setEventListener: function () {
         var tBody = document.querySelector("tbody");
-        console.log(tBody);
         tBody.addEventListener("click", function (event){
             var elementClicked = event.target;
             if (elementClicked.className === "cell")
             {
                 var clickedRow = elementClicked.getAttribute("data-row");
                 var clickedCol = elementClicked.getAttribute("data-col");
-                board.reveal(parseInt(clickedRow),parseInt(clickedCol));
-                view.displayBoard();
+                if (!FIRSTCLICK)
+                    board.reveal(parseInt(clickedRow),parseInt(clickedCol));
+                if (board.cells[clickedRow][clickedCol].mine)
+                {
+                    board.revealAll();
+                    var face = document.querySelector("img");
+                    face.setAttribute("src", "xface.jpg");
+                    view.displayBoard();
+                }
+                else if (FIRSTCLICK)
+                {
+                    TOTALMINES = board.makeMines(parseInt(clickedRow), parseInt(clickedCol));
+                    FIRSTCLICK = false;
+                    board.reveal(parseInt(clickedRow),parseInt(clickedCol));
+                    view.displayBoard();
+                }
+                if (board.checkWin())
+                {
+                    board.revealAll();
+                    var face = document.querySelector("img");
+                    face.setAttribute("src", "sunface.jpg");
+                    view.displayBoard();
+                }
+                else view.displayBoard();
             }
         });
         tBody.addEventListener("contextmenu", function(event) {
@@ -231,6 +276,5 @@ var view = {
 }
 
 board.createBoard(ROWS,COLUMNS);
-TOTALMINES = board.makeMines();
 view.displayBoard();
 view.setEventListener();
